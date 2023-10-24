@@ -1,5 +1,6 @@
 using Random
 using LinearAlgebra
+using Calculus
 
 function grad_partial(x, u, v, w)
   #=
@@ -33,9 +34,10 @@ function grad_partial_p(x, u, v, w, p)
   return g
 end
 
-
-
-function quadratica(x)
+function quadratica(x::Vector{Float64})
+  #=
+  #Calcula a função quadrática para o vetor x e retorna um float
+  =#
     y = 0
     x = x.^2
     for i in 1:length(x)
@@ -45,7 +47,10 @@ function quadratica(x)
     return y
 end
 
-function Rosenbrock(x)
+function Rosenbrock(x::Vector{Float64})
+  #=
+  #Calcula a função de Rosenbrock para o vetor x e retorna um float
+  =#
     y=0
     for i in 1:Int((length(x)/2))
         y += 10*(x[2*i]-x[2*i-1]^2)^2 + (x[2*i-1]-1)^2
@@ -53,11 +58,10 @@ function Rosenbrock(x)
     return y
 end
 
-function fun(x, grad=0)
+function fun(x::Vector{Float64}, grad=0)
 	#=grad(Int) -1 retorna o gradiente
 				0 retorna a função 
 				1 retorna a função e o gradiente
-
 	=#
 	aux1 = x[1] .+ x[2].*u-v
 	aux2 = atan.(aux1)+0.5*pi*w;
@@ -81,98 +85,98 @@ function fun(x, grad=0)
 end
 
 
-function minimizador_lucio(x0, f, M, α=10e-4, σ=0.5, ε=10e-9)
-    x_ant = copy(x0)
-    x_pos = copy(x0)
-    k=0; g_ant= Calculus.gradient(f, x_pos);
-    g_pos = copy(g_ant);
-    η = norm(g_pos, Inf) 
+function minimizador_lucio(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, ε=10e-9)
+    x = copy(x)
+    x_p = copy(x)
+    k=0; g= Calculus.gradient(f, x_p);
+    g_p = copy(g);
+    η = norm(g_p, Inf) 
 
     while (η >= ε) && (k < M)
         if k==0
             t=1
         else
-            t = norm(x_pos-x_ant, 2)/norm(g_pos-g_ant, 2)
+            t = norm(x_p-x, 2)/norm(g_p-g, 2)
         end
-        w = α*(g_pos')*g_pos;
-        fx = f(x_pos)
-        while f(x_pos-t*g_pos) > fx-t*w
+        W = α*(g_p')*g_p;
+        fx = f(x_p)
+        while f(x_p-t*g_p) > fx-t*W
             t =  σ*t;
         end
-        x_ant = copy(x_pos);
-        x_pos = x_pos-t*g_pos;
-        g_ant = copy(g_pos)
-        g_pos = Calculus.gradient(f, x_pos)
-        η = norm(g_pos, Inf);
+        x = copy(x_p);
+        x_p = x_p-t*g_p;
+        g = copy(g_p)
+        g_p = Calculus.gradient(f, x_p)
+        η = norm(g_p, Inf);
         k = k+1
     end
-    return x_pos;
+    return x_p;
 end
 
-function minimizador_lucio_grad(x0, f, M, α=10e-4, σ=0.5, ε=10e-9)
-    x_ant = copy(x0)
-    x_pos = copy(x0)
-    k=0; g_ant= f(x_ant, -1)
-    g_pos = copy(g_ant);
-    η = norm(g_pos, Inf) 
+function minimizador_lucio_grad(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, ε=10e-9)
+    x = copy(x0)
+    x_p = copy(x)
+    k=0; g= f(x, -1)
+    g_p = copy(g);
+    η = norm(g_p, Inf) 
 
     while (η >= ε) && (k < M)
         if k==0
             t=1
         else
-            t = norm(x_pos-x_ant, 2)/norm(g_pos-g_ant, 2)
+            t = norm(x_p-x, 2)/norm(g_p-g, 2)
         end
-        w = α*(g_pos')*g_pos;
-        fx = f(x_pos)
-        while f(x_pos-t*g_pos) > fx-t*w
+        w = α*(g_p')*g_p;
+        fx = f(x_p)
+        while f(x_p-t*g_p) > fx-t*w
             t =  σ*t;
         end
-        x_ant = copy(x_pos);
-        x_pos = x_pos-t*g_pos;
-        g_ant = copy(g_pos)
-        g_pos = f(x_pos, -1)
-        η = norm(g_pos, Inf);
+        x = copy(x_p);
+        x_p = x_p-t*g_p;
+        g = copy(g_p)
+        g_p = f(x_p, -1)
+        η = norm(g_p, Inf);
         k = k+1
     end
-    return x_pos;
+    return x_p;
 end
 
-function grad_est(x0, u, v, w, M, t=1, ε=10e-9)
-    x = copy(x0);
-    x_pos = copy(x0);
-    g = grad_partial(x_pos, u, v, w); k=0; 
-    g_pos = copy(g);
+function grad_est(x::Vector{Float64}, u, v, w, M::Int, t::Int=1, ε=10e-9)
+    x = copy(x);
+    x_p = copy(x);
+    g = grad_partial(x_p, u, v, w); k=0; 
+    g_p = copy(g);
     η = norm(g, Inf);
 
     while (η >= ε) && (k < M)
 
-        x = copy(x_pos);
-        x_pos = x_pos-t*g_pos;
-        g = copy(g_pos)
-        g_pos = grad_partial(x_pos, u, v, w)
-        η = norm(g_pos, Inf);
+        x = copy(x_p);
+        x_p = x_p-t*g_p;
+        g = copy(g_p)
+        g_p = grad_partial(x_p, u, v, w)
+        η = norm(g_p, Inf);
         k+=1
     end
-    return x_pos;
+    return x_p;
 end
 
-function grad_estp(x0, u, v, w ,p , M, t=1, ε=10e-9)
-    x = copy(x0);
-    x_pos = copy(x0);
-    g = grad_partial_p(x_pos, u, v, w); k=0; 
-    g_pos = copy(g);
+function grad_estp(x::Vector, u, v, w ,p::Int , M, t=1, ε=10e-9)
+    x = copy(x);
+    x_p = copy(x);
+    g = grad_partial_p(x_p, u, v, w); k=0; 
+    g_p = copy(g);
     η = norm(g, Inf);
 
     while (η >= ε) && (k < M)
 
-        x = copy(x_pos);
-        x_pos = x_pos-t*g_pos;
-        g = copy(g_pos)
-        g_pos = grad_partial_p(x_pos, u, v, w, p)
-        η = norm(g_pos, Inf);
+        x = copy(x_p);
+        x_p = x_p-t*g_p;
+        g = copy(g_p)
+        g_p = grad_partial_p(x_p, u, v, w, p)
+        η = norm(g_p, Inf);
         k+=1
     end
-    return x_pos;
+    return x_p;
 end
 
 
