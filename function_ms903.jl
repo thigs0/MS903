@@ -179,4 +179,26 @@ function grad_estp(x::Vector, u, v, w ,p::Int , M, t=1, ε=10e-9)
     return x_p;
 end
 
+function confusion_matrix(w1::Vector, w2::Vector)
+  #= Calcula a matriz de confusão sendo que w1 são os valores exatas e w2 são os previstos pelo modelo
+  =#
+  M = [0.0 0.0; 0.0 0.0]; # matriz de confusão
+  n = length(w1)
+  for i in 1:n
+    if w1[i] == w2[i] # Se acertamos na previsão
+      if w1[i] == 1
+        M[1, 1] += 1
+      else
+        M[2, 2] += 1
+      end
 
+    else # Se erramos a previsão
+      if w1[i] == 1 # se o esperado era positivo
+        M[1,2] += 1
+      else
+        M[2,1] += 1
+      end
+    end
+  end
+  return M
+end

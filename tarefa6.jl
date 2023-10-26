@@ -15,7 +15,7 @@ global w = df_treino[:,4]
 
 function circ(x::Vector)
   #p é um vetor com duas componentes(x,y)
- # é um vetor com o centro da esfera
+  # é um vetor com o centro da esfera
   #R é o raio do circulo
   # A função diz se temos um ponto dentro ou fora da circunferencia
   
@@ -25,13 +25,31 @@ function circ(x::Vector)
   return sum((aux1 - (pi/2)*w).^2)/length(u);
 end
 
-x = Vector([0.0, 0, 1])
-x = minimizador_lucio(x, circ, 100)
-tmin = 0
-tmax = 2π
-tvec = range(tmin, tmax, length = 100)
+function w_circ(x1::Vector, x2::Vector, x3::Vector)
+ # Com os parâmetros do circulo, retorna o vetor que prevemos 
+  c = (x3[1].-x1).^2 + (x3[2].-x2).^2 
+  c = c .- x3[3]^2
+  c = sign.(c)
+end
 
-plot(x[3]*sin.(tvec).+x[1], x[3]*cos.(tvec).+x[2])
+x = Vector([0.0, 0, 1]) # cada coordenada representa eixo x, eixo y e raio
+x = minimizador_lucio(x, circ, 100)
+circulo(x) = x[3]*sin.(range(0, 2π, 100)).+x[1], x[3]*cos.(range(0, 2π, 100)).+x[2]
+plot(circulo(x))
+w2 = w_circ(u,v,x);
+println("A matrix de confusão dos dados de treino é:")
+display(confusion_matrix(w,w2))
 
 scatter!(u,v, group=w)
-savefig("teste.png")
+savefig("dados_treino.png")
+
+global u = df_teste[:,2]
+global v = df_teste[:,3]
+global w = df_teste[:,4]
+w2 = w_circ(u,v,x);
+
+plot(circulo(x))
+scatter!(u,v, group=w)
+println("A matrix de confusão dos dados de teste é:")
+display(confusion_matrix(w,w2))
+savefig("dados_teste.png")
