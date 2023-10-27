@@ -85,7 +85,7 @@ function fun(x::Vector{Float64}, grad=0)
 end
 
 
-function minimizador_lucio(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, ε=10e-9)
+function minimizador(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, ε=10e-9)
     x = copy(x)
     x_p = copy(x)
     k=0; g= Calculus.gradient(f, x_p);

@@ -13,6 +13,8 @@ global u = df_treino[:,2]
 global v = df_treino[:,3]
 global w = df_treino[:,4]
 
+scatter(u,v, group=w)
+savefig("treino.png")
 function circ(x::Vector)
   #p é um vetor com duas componentes(x,y)
   # é um vetor com o centro da esfera
@@ -33,7 +35,7 @@ function w_circ(x1::Vector, x2::Vector, x3::Vector)
 end
 
 x = Vector([0.0, 0, 1]) # cada coordenada representa eixo x, eixo y e raio
-x = minimizador_lucio(x, circ, 100)
+x = minimizador(x, circ, 100)
 circulo(x) = x[3]*sin.(range(0, 2π, 100)).+x[1], x[3]*cos.(range(0, 2π, 100)).+x[2]
 plot(circulo(x))
 w2 = w_circ(u,v,x);
