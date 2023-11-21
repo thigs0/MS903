@@ -114,7 +114,6 @@ function minimizador(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, 
 end
 
 function minimizador_lucio_grad(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, ε=10e-9)
-    x = copy(x0)
     x_p = copy(x)
     k=0; g= f(x, -1)
     g_p = copy(g);
