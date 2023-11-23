@@ -1,10 +1,10 @@
-include("function_ms903.jl")
+include("./function_ms903.jl")
 using DataFrames
 using CSV
 using Plots
 
-df_treino = CSV.File("files\dado_testa", header=false, delim=" ")
-df_teste = CSV.File("files\dado_treino", header=false, delim=" ")
+df_treino = CSV.File("./files/dado_testa", header=false, delim=" ")
+df_teste = CSV.File("./files/dado_treino", header=false, delim=" ")
 df_treino = DataFrame(df_treino)
 df_teste = DataFrame(df_teste)
 
@@ -59,7 +59,7 @@ function F(x::Vector, flag::Int=0)
 		g += aux*b;
 	end
   fv /= 2*m
-  fv += lambda*norm(x)^2
+  fv += 0.5*lambda*norm(x)^2
   g = g./m
 	if flag == 0
 		return fv;
@@ -71,12 +71,13 @@ function F(x::Vector, flag::Int=0)
 end
 
 rand.seed(9)
-x0 = rand(9)
+x0 = (2*rand(9)-1)*10
 println(x)
 l = Vector([0, 1e-3, 1e-2, 1e-1,1, 10, 10^2])
-for i in l
-    global lambda = i
-    y = minimizador_lucio_grad(x0, F, 100)
+for i in length(l)
+	global lambda = l[i]
+    	x = minimizador_lucio_grad(x0, F, 500, 1e-4)
+	y[i] = F(x) - norm(x)^2*lambda*0.5 
 end
 
 scatter!(length(l), y)
