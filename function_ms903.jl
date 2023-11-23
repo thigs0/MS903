@@ -113,7 +113,7 @@ function minimizador(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, 
     return x_p;
 end
 
-function minimizador_lucio_grad(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, ε=10e-9)
+function minimizador_lucio_grad(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, ε=10e-5)
     x_p = copy(x)
     k=0; g= f(x, -1)
     g_p = copy(g);
@@ -123,17 +123,19 @@ function minimizador_lucio_grad(x::Vector{Float64}, f::Function, M::Int, α=10e-
         if k==0
             t=1
         else
-            t = norm(x_p-x, 2)/norm(g_p-g, 2)
+          if g_p == g
+            g_p = f(x_p, -1)
+          end
+          t = norm(x_p-x, 2)/norm(g_p-g, 2)
         end
         w = α*(g_p')*g_p;
-        fx = f(x_p)
-        while f(x_p-t*g_p) > fx-t*w
-            t =  σ*t;
+        g = g_p
+        fx, g_p = f(x_p, 1)
+        while f(x_p-t*g) > fx-t*w
+          t *= σ;
         end
         x = copy(x_p);
-        x_p = x_p-t*g_p;
-        g = copy(g_p)
-        g_p = f(x_p, -1)
+        x_p -= t*g_p;
         η = norm(g_p, Inf);
         k = k+1
     end
