@@ -13,8 +13,10 @@ A princípio criaremos uma função simples apenas de adição e multiplicação
 
 Criaremos as funçãos que usaremos a frente
 
-´´´python
-function minimizador(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, ε=10e-9)
+´´´
+
+function minimizador(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, ε=10e-9) 
+    #=Dado um vetor inicial, uma função que é aplicada em x 
     x = copy(x)
     x_p = copy(x)
     k=0; g= Calculus.gradient(f, x_p);
@@ -41,4 +43,5 @@ function minimizador(x::Vector{Float64}, f::Function, M::Int, α=10e-4, σ=0.5, 
     end
     return x_p;
 end
+
 ´´´
